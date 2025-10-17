@@ -1,91 +1,88 @@
 
-const calculadora = criaCalculadora();
-calculadora.inicia();
+function calculadora() {
+    this.display = document.querySelector('.display');
 
-function criaCalculadora() {
-    return {
-        display: document.querySelector('.display'),
+    this.inicia = () => {
+        clearDisplay();
+        cliqueBotoes();
 
-        inicia: function() {
-            this.clearDisplay();
-            this.cliqueBotoes();
+        pressionaDelete();
+        pressionaEnter();
+    }
 
-            this.pressionaEnter();
-            this.pressionaDelete();
-        },
+    const cliqueBotoes = () => {
+        document.addEventListener('click', e => {
+            const el = e.target;
 
-        cliqueBotoes: function() {
-            document.addEventListener('click', e => {
-                const el = e.target;
-                
-                if (el.classList.contains('btn-num')) {
-                    this.btnParaDisplay(el.innerText);
-                }
-                
-                if (el.classList.contains('btn-clear')) {
-                    this.clearDisplay();
-                }
+            isBtnNumber(el);
+            isBtnClear(el);
+            isBtnDel(el);
+            isBtnEquals(el);
 
-                if (el.classList.contains('btn-del')) {
-                    this.apagaUm();
-                }
+            this.display.focus()
+        })
+    }
 
-                if (el.classList.contains('btn-eq')) {
-                    this.realizaConta();
-                }
+    const btnParaDisplay = (valor) => this.display.value += valor;
+    const clearDisplay = () => this.display.value = ' ';
+    const apagaUm = () => this.display.value = this.display.value.slice(0, -1);
+    const realizaConta = () => {
+        let conta = this.display.value;
 
-                this.display.focus();
+        try {
+            conta = eval(conta);
 
-            });
-        },
-
-        pressionaEnter: function() {
-            this.display.addEventListener('keyup', e => {
-                if (e.keyCode === 13) {
-                    this.realizaConta();
-                }
-            });
-        },
-
-        pressionaDelete: function() {
-            this.display.addEventListener('keyup', e => {
-                if (e.keyCode === 46 || e.keyCode === 8) {
-                    this.clearDisplay();
-                }
-            });
-        },
-
-        btnParaDisplay: function(valor) {
-            this.display.value += valor;
-        },
-
-        clearDisplay: function() {
-            this.display.value = ' ';
-        },
-
-        apagaUm: function() {
-            this.display.value = this.display.value.slice(0, -1);
-
-        },
-
-        realizaConta: function() {
-            let conta = this.display.value;
-
-            try {
-                conta = eval(conta);
-
-                if (!conta) {
-                    alert('Conta inválida.');
-                    return;
-                }
-
-                this.display.value =conta;
-            } catch(e) {
-                alert('Conta inválida.');
+            if (!conta) {
+                alert('Conta inválida!');
                 return;
             }
-        },
 
-    };
+            this.display.value = conta;
+        } catch(e) {
+            alert('Conta inválida!');
+            return;
+        }
+    }
+
+    const pressionaEnter = () => {
+        this.display.addEventListener('keyup', (e) => {
+            if (e.keyCode === 13) realizaConta();
+        });
+    }
+
+    const pressionaDelete = () => {
+        this.display.addEventListener('keyup', (e) => {
+            if (e.keyCode === 46) clearDisplay();
+        });
+    }
+
+
+    function isBtnNumber(e) {
+        if (e.classList.contains('btn-num')) {
+             btnParaDisplay(e.innerText);
+        }
+    }
+
+    function isBtnClear(e) {
+        if (e.classList.contains('btn-clear')) {
+             clearDisplay();
+        }
+    }
+
+    function isBtnDel(e) {
+        if (e.classList.contains('btn-del')) {
+             apagaUm();
+        }
+    }
+
+    function isBtnEquals(e) {
+        if (e.classList.contains('btn-eq')) {
+             realizaConta();
+        }   
+    }
+
+    
 }
 
+const calc = new calculadora();
+calc.inicia();
